@@ -50,20 +50,31 @@
     return true;
   }
 
-  function waitForGridRows(selector, callback, retries = 30, delay = 100) {
+  function waitForGridRows(selector, callback, retries = 30, delay = 300) {
+    let lastRowCount = -1;
+    let stableCount = 0;
+
     const check = () => {
       const el = document.querySelector(selector);
-      const hasRows = el?.querySelectorAll('tbody > tr')?.length > 0;
-      if (hasRows) {
-        setTimeout(() => {
-          callback(el);
-        }, delay);
+      const rowCount = el?.querySelectorAll('tbody > tr')?.length || 0;
+
+      if (rowCount > 0 && rowCount === lastRowCount) {
+        stableCount++;
+      } else {
+        stableCount = 0;
+      }
+
+      lastRowCount = rowCount;
+
+      if (stableCount >= 3) {
+        callback(el);
       } else if (retries > 0) {
         setTimeout(() => check(--retries), delay);
       } else {
-        alert(`"${selector}" yüklenmedi veya boş döndü.`);
+        alert(`"${selector}" tablo kararlı hale gelmedi veya boş.`);
       }
     };
+
     check();
   }
 
