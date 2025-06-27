@@ -50,12 +50,14 @@
     return true;
   }
 
-  function waitForGridRows(selector, callback, retries = 30, delay = 500) {
+  function waitForGridRows(selector, callback, retries = 30, delay = 100) {
     const check = () => {
       const el = document.querySelector(selector);
       const hasRows = el?.querySelectorAll('tbody > tr')?.length > 0;
       if (hasRows) {
-        callback(el);
+        setTimeout(() => {
+          callback(el);
+        }, delay);
       } else if (retries > 0) {
         setTimeout(() => check(--retries), delay);
       } else {
